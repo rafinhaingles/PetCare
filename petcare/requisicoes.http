@@ -1,0 +1,233 @@
+@base = http://localhost/petcare
+@token = {{login.response.body.$.token}}
+@tutor = {{criarTutor.response.body.$.id}}
+@pet = {{criarPet.response.body.$.id}}
+
+### Login — esperado 200
+# @name login
+POST {{base}}/login
+Content-Type: application/json
+
+{"email": "professor@petcare.com", "senha": "PetCare123!"}
+
+### Senha errada — esperado 401
+POST {{base}}/login
+Content-Type: application/json
+
+{"email": "professor@petcare.com", "senha": "errada"}
+
+### Email inexistente — esperado 401
+POST {{base}}/login
+Content-Type: application/json
+
+{"email": "ausente@example.com", "senha": "errada"}
+
+### Login incompleto — esperado 422
+POST {{base}}/login
+Content-Type: application/json
+
+{}
+
+### JSON inválido — esperado 400
+POST {{base}}/login
+Content-Type: application/json
+
+{
+
+### Listar tutores — esperado 200
+GET {{base}}/tutores
+
+### Consultar tutor — esperado 200
+GET {{base}}/tutores/1
+
+### Tutor inexistente — esperado 404
+GET {{base}}/tutores/999999
+
+### Pets do tutor — esperado 200
+GET {{base}}/tutores/1/pets
+
+### Pets de tutor inexistente — esperado 404
+GET {{base}}/tutores/999999/pets
+
+### Criar sem token — esperado 401
+POST {{base}}/tutores
+Content-Type: application/json
+
+{"nome": "Tutor Teste", "telefone": "61999999999", "email": "teste@example.com"}
+
+### Token inválido — esperado 401
+POST {{base}}/tutores
+Authorization: Bearer 0000000000000000000000000000000000000000000000000000000000000000
+Content-Type: application/json
+
+{"nome": "Tutor Teste", "telefone": "61999999999", "email": "teste@example.com"}
+
+### Tutor inválido — esperado 422
+POST {{base}}/tutores
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{}
+
+### Email repetido — esperado 409
+POST {{base}}/tutores
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"nome": "Tutor Teste", "telefone": "61999999999", "email": "ana@example.com"}
+
+### Criar tutor — esperado 201
+# @name criarTutor
+POST {{base}}/tutores
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"nome": "Tutor Teste", "telefone": "61999999999", "email": "teste@example.com"}
+
+### Alterar tutor — esperado 200
+PUT {{base}}/tutores/{{tutor}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"nome": "Tutor Alterado", "telefone": "61999999999", "email": "teste@example.com"}
+
+### Alterar tutor sem token — esperado 401
+PUT {{base}}/tutores/1
+Content-Type: application/json
+
+{"nome": "Tutor Teste", "telefone": "61999999999", "email": "teste@example.com"}
+
+### Alterar tutor inexistente — esperado 404
+PUT {{base}}/tutores/999999
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"nome": "Tutor Teste", "telefone": "61999999999", "email": "teste@example.com"}
+
+### Alterar tutor com email repetido — esperado 409
+PUT {{base}}/tutores/{{tutor}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"nome": "Tutor Teste", "telefone": "61999999999", "email": "ana@example.com"}
+
+### Alterar tutor inválido — esperado 422
+PUT {{base}}/tutores/{{tutor}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{}
+
+### Excluir tutor com pets — esperado 409
+DELETE {{base}}/tutores/1
+Authorization: Bearer {{token}}
+
+### Excluir tutor sem token — esperado 401
+DELETE {{base}}/tutores/1
+
+### Excluir tutor inexistente — esperado 404
+DELETE {{base}}/tutores/999999
+Authorization: Bearer {{token}}
+
+### Listar pets — esperado 200
+GET {{base}}/pets
+
+### Filtrar pets — esperado 200
+GET {{base}}/pets?especie=gato
+
+### Consultar pet com JOIN — esperado 200
+GET {{base}}/pets/1
+
+### Pet inexistente — esperado 404
+GET {{base}}/pets/999999
+
+### Criar pet sem token — esperado 401
+POST {{base}}/pets
+Content-Type: application/json
+
+{"nome": "Toby", "especie": "cachorro", "raca": null, "data_nascimento": "2022-01-01", "peso_kg": 8, "tutor_id": 1}
+
+### Pet inválido — esperado 422
+POST {{base}}/pets
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{}
+
+### Pet com tutor inexistente — esperado 422
+POST {{base}}/pets
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"nome": "Toby", "especie": "cachorro", "raca": null, "data_nascimento": "2022-01-01", "peso_kg": 8, "tutor_id": 999999}
+
+### Criar pet — esperado 201
+# @name criarPet
+POST {{base}}/pets
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"nome": "Toby", "especie": "cachorro", "raca": null, "data_nascimento": "2022-01-01", "peso_kg": 8, "tutor_id": {{tutor}}}
+
+### Alterar pet — esperado 200
+PUT {{base}}/pets/{{pet}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"nome": "Toby Alterado", "especie": "cachorro", "raca": null, "data_nascimento": "2022-01-01", "peso_kg": 8, "tutor_id": 1}
+
+### Alterar pet sem token — esperado 401
+PUT {{base}}/pets/1
+Content-Type: application/json
+
+{"nome": "Toby", "especie": "cachorro", "raca": null, "data_nascimento": "2022-01-01", "peso_kg": 8, "tutor_id": 1}
+
+### Alterar pet inexistente — esperado 404
+PUT {{base}}/pets/999999
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"nome": "Toby", "especie": "cachorro", "raca": null, "data_nascimento": "2022-01-01", "peso_kg": 8, "tutor_id": 1}
+
+### Alterar pet inválido — esperado 422
+PUT {{base}}/pets/{{pet}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{}
+
+### Excluir pet sem token — esperado 401
+DELETE {{base}}/pets/1
+
+### Excluir pet inexistente — esperado 404
+DELETE {{base}}/pets/999999
+Authorization: Bearer {{token}}
+
+### Excluir pet — esperado 204
+DELETE {{base}}/pets/{{pet}}
+Authorization: Bearer {{token}}
+
+### Excluir tutor sem pets — esperado 204
+DELETE {{base}}/tutores/{{tutor}}
+Authorization: Bearer {{token}}
+
+### Rota desconhecida — esperado 404
+GET {{base}}/inexistente
+
+### Logout sem token — esperado 401
+POST {{base}}/logout
+
+### Logout — esperado 204
+POST {{base}}/logout
+Authorization: Bearer {{token}}
+
+### Reutilizar token revogado — esperado 401
+POST {{base}}/tutores
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"nome": "Tutor Teste", "telefone": "61999999999", "email": "teste@example.com"}
+
+### Repetir logout — esperado 401
+POST {{base}}/logout
+Authorization: Bearer {{token}}

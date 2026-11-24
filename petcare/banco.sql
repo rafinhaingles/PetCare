@@ -1,0 +1,10 @@
+DROP DATABASE IF EXISTS petcare;
+CREATE DATABASE petcare CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE petcare;
+CREATE TABLE tutores (id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY, nome VARCHAR(100) NOT NULL, telefone VARCHAR(30) NOT NULL, email VARCHAR(254) NOT NULL UNIQUE) ENGINE=InnoDB;
+CREATE TABLE pets (id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY, nome VARCHAR(60) NOT NULL, especie ENUM('cachorro','gato','ave','roedor','outro') NOT NULL, raca VARCHAR(100) NULL, data_nascimento DATE NOT NULL, peso_kg DECIMAL(6,3) NOT NULL, tutor_id INT UNSIGNED NOT NULL, FOREIGN KEY (tutor_id) REFERENCES tutores(id) ON DELETE RESTRICT) ENGINE=InnoDB;
+CREATE TABLE usuarios (id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY, nome VARCHAR(100) NOT NULL, email VARCHAR(254) NOT NULL UNIQUE, senha_hash VARCHAR(255) NOT NULL) ENGINE=InnoDB;
+CREATE TABLE tokens (id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY, usuario_id INT UNSIGNED NOT NULL, token CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL UNIQUE, expira_em DATETIME NOT NULL, FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE) ENGINE=InnoDB;
+INSERT INTO tutores (nome,telefone,email) VALUES ('Ana Silva','61911110001','ana@example.com'),('Bruno Costa','61911110002','bruno@example.com'),('Carla Lima','61911110003','carla@example.com'),('Diego Souza','61911110004','diego@example.com'),('Elisa Santos','61911110005','elisa@example.com');
+INSERT INTO pets (nome,especie,raca,data_nascimento,peso_kg,tutor_id) VALUES ('Thor','cachorro','Labrador','2021-03-10',28,1),('Luna','gato',NULL,'2022-05-12',4,1),('Mel','cachorro','Poodle','2020-01-15',7,2),('Nina','gato','Siamês','2023-06-20',3.8,2),('Pipoca','ave','Calopsita','2024-02-01',0.09,3),('Bob','cachorro',NULL,'2019-07-11',15,3),('Max','roedor','Hamster','2024-09-05',0.12,4),('Mia','gato',NULL,'2022-11-08',4.5,4),('Rex','cachorro','Beagle','2021-08-09',12,5),('Lola','outro','Coelho','2023-04-02',2.1,5);
+INSERT INTO usuarios (nome,email,senha_hash) VALUES ('Professor','professor@petcare.com','$2y$12$uVUNhy2GGN2r.On3rkMVtOb396o5nNwhs8O3o1eLfFVhWF4IAzhF6');
